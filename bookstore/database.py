@@ -1,35 +1,23 @@
-from typing import Optional
-
 from sqlalchemy import create_engine
-from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-from sqlmodel import Field, SQLModel
+from sqlmodel import SQLModel, Field
 
-DATABASE_URL = "sqlite:///./test.db"  # Example using SQLite
-Base = declarative_base()
-
-
-class UserCredentials(SQLModel, table=True):
-    __tablename__ = "user_credentials"
-    id: Optional[int] = Field(default=None, primary_key=True, index=True)
-    email: str = Field(index=True, unique=True)
-    password: str
-
-
-class Book(SQLModel, table=True):
-    __tablename__ = "books"
-    id: Optional[int] = Field(default=None, primary_key=True, index=True)
-    name: str = Field(index=True)
-    author: str = Field(index=True)
-    published_year: int
-    book_summary: str
-
+DATABASE_URL = "sqlite:///./test.db"
 
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-SQLModel.metadata.create_all(engine)
+# ✅ Clear previous metadata before defining models
+SQLModel.metadata.clear()
 
+class Book(SQLModel, table=True):
+    id: int = Field(default=None, primary_key=True)
+    title: str
+    author: str
+    published_year: int
+
+def init_db():
+    SQLModel.metadata.create_all(engine)
 
 def get_db():
     db = SessionLocal()
